@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<body>
+<?php
+function checkit($wall,$BFF,$count) {
+        $wall_F = $wall[0];
+        $TL = $wall_F['timeStamp']; #earlier
+        $BF = $wall_F['blockNumber']; #earlier
+        $wall_L = $wall[-1];
+        $TL = $wall_L['timeStamp']; #later
+        $BL = $wall_L['blockNumber']; #later
+        $penit = $penit.'{count #'.$count.' block first'.$BF.' block last'.$BL.'timestamp first'.$TF.'timestamp last'.$TL.'length '.$L.'for ';
+        pen($penit,'wtfiswrong.txt');
+        if ($count != 0) {
+            if ($BL != $BFF) {
+                return $BL;
+            } else {
+                return 0;
+            }
+        }else {
+            return $BL;
+        }
+}
+function pen($txt,$file) {
+   
+    $file_name = $file;
+    $file = $file_name;
+    $file = fopen($file_name , 'w') or die("X_x");
+    fwrite($file, $txt);
+    fclose($file);
+}
+function countit($X) {
+    $X = json_encode($X);
+    $L_A =strlen(strval($X));
+    echo $L_A;
+    $X = str_replace(",","",$X);
+    $L_B =strlen(strval($X));
+    echo $L_B;
+    $obj = $L_A - $L_B;
+    return $obj;
+}
+function get_url($X) {
+    sleep(3);
+    $obj = json_decode(file_get_contents($X), true);
+    $obj = $obj['result'];
+    echo json_encode($obj);
+    return $obj;
+}
+function get_js($X) {
+    $path = "variables/";
+    $js = json_decode(file_get_contents($path.$X), true);
+    return $js;
+}
+$count = 0;
+$wall = '';
+$addP = '0xDB5BbAE9B0e82D60fEdc1dCc944eF8D319682Ce9';
+$key = '5BGVIWTY2RHQHTJIMDNFY3WJM87GTUEXCW';
+$F = 'time = {';
+$L= '}';
+if(isset($_POST['add'])){
+    $addP=$_POST['add'];
+    if(isset($_POST['Fdate'])){
+        $XTSF=$_POST['Fdate'];
+
+    }
+    if (empty($_POST['Fdate'])) {
+        $XTSF = '1599078250';
+    }
+    
+    if(isset($_POST['Ldate'])){
+        $XTSL=$_POST['Ldate'];
+    }
+    if (empty($_POST['Ldate'])) {
+        $url ='https://api.etherscan.io/api?module=stats&action=ethprice&apikey='.$key;
+        $X = get_url($url);
+        $XTSL = $X['ethusd_timestamp'];
+        $TSL = '"lastStamp":"'.$XTSL.'",';
+    }
+}
+$url ='https://api.etherscan.io/api?module=block&action=getblocknobytime&timestamp='.$XTSL.'&closest=before&apikey='.$key;
+$XBL = get_url($url);
+$BL = '"lastBlock":"'.$XBL.'",';
+$TSF = '"firstStamp":"'.$XTSF.'",';
+$url ='https://api.etherscan.io/api?module=block&action=getblocknobytime&timestamp='.$XTSF.'&closest=before&apikey='.$key;
+$XBF= get_url($url);
+$BF = '"firstBlock":"'.$XBF.'"';
+$txt = $F.$TSL.$TSF.$BF;
+pen($txt,'te.txt');
+echo $txt;
+$supply = '';
+while ($XBF != 0):
+    $wall = $wall.$wall_tx;
+    $wall_tx = 'http://api.etherscan.io/api?module=account&action=tokentx&address='.$addP.'&startblock='.$XBF.'&endblock='.$XBL.'&sort=asc&apikey='.$key;
+    $wall_tx = get_url($wall_tx);
+    $XBF = checkit($wall_tx,$XBF,$count);
+    $count = $count + 1;
+endwhile;
+pen(json_encode($wall),'wall.txt');
+pen(json_decode($wall),'wall.txt');
+pen(json_encode($wall),'wall.py');
+pen(json_decode($wall),'wall.py');
+pen(json_encode($wall),'wall.php');
+pen(json_decode($wall),'wall.php');
+?>
+
+<form method="post">
+Enter address <input type="text" name="add"/><hr/>
+Enter beg date <input type="text" name="Fdate"/><hr/>
+Enter end date <input type="text" name="Ldate"/><hr/>
+<input type="submit" name="submit" value="Submit"> 
+</form>
+<p><?php echo $wall?></p>
+</body>
+</html>
