@@ -1,0 +1,920 @@
+#!/opt/rh/rh-python35/root/usr/python
+import os
+import os.path
+import requests
+import json
+import time
+import datetime
+import math
+import gc
+import sys
+def reques_timer():
+    import datetime
+    now = datetime.datetime.now().timestamp()
+    i = (float(now) - float(reader('last.txt')))
+    if float(i) < float(0.3):
+        return (float(0.3) - float(i)), now
+    return 0, now
+def wall_call(add,B_L,B_G):
+    link = wall_sup(add,B_L,B_G)
+    JS = sites(link)
+    js = JS["result"]
+    return js
+def first_last(js,X):
+    Y = X
+    try:
+        W = js[0]
+        F = W['timeStamp']
+        B_L = W['blockNumber']
+        W = js[-1]
+        L = W['timeStamp']
+        B_G = W['blockNumber']   
+        Y = F,L,B_L,B_G
+        if X !=0:
+            if int(X[3]) == int(B_G) :
+                return Y,1
+            else:
+                return Y,0
+    except:
+        return Y,-1
+def reader_B(file):
+    with open(file, 'r',encoding='UTF-8') as f:
+        text = f.read()
+        return text
+def reader(file):
+    with open(file, 'r') as f:
+        text = f.read()
+        return text
+def pen_B(paper, place):
+    
+    with open(place, 'w',encoding='UTF-8') as f:
+        f.write(str(paper))
+        f.close()
+        return
+def pen(paper, place):
+    with open(place, 'w') as f:
+        f.write(str(paper))
+        f.close()
+        return
+def sites(A):
+    U = [A]
+    for url in U:
+        X = str(U[0])
+        i,now = reques_timer()
+        time.sleep(i)
+        r = requests.get(X)
+        pen(str(now),'last.txt')
+        PS = r.text
+        JS = json.loads(PS)
+    return JS
+def keys():
+    with open('/home4/putkoff/gtsgate.com/script/wallets/variables/key.txt', mode='r') as key_file:
+        key = json.loads(key_file.read())['key']
+        return key
+def block(A):
+    key = keys()
+    U = 'https://api.etherscan.io/api?module=block&action=getblocknobytime&timestamp='+str(A)+'&closest=before&apikey='+str(key)
+    
+    JS = sites(U)
+    Bl = JS['result']
+    return Bl
+def exists_js(file):
+    try:
+        f = reader_B(file)
+        if f !='':
+            try:
+                A = projs(f)
+                
+                return A
+            except IOError:
+                print('json not formed')
+        else:
+            f = '[]'
+            return f
+    except IOError:
+        pen('[]',file)
+        return json.loads('[]')
+def exists(file):
+    try:
+        f = reader_B(file)
+    except IOError:
+        pen('',file)
+        return ''
+def dirs_main():
+    path = "/home4/putkoff/gtsgate.com/script/wallets"
+    # Check current working directory.
+    retval = os.getcwd()
+    print ("Current working directory %s" % retval)
+    # Now change the directory
+    os.chdir(path)
+    # Check current working directory.
+    retval = os.getcwd()
+    print("Directory changed successfully %s" % retval)
+    #print("Directory '% s' created" % directory)
+    return
+def dirs_A(fname):
+    path = '/home4/putkoff/gtsgate.com/script/wallets/wallets/'+str(fname)
+    # Check current working directory.
+    retval = os.getcwd()
+    print ("Current working directory %s" % retval)
+    # Now change the directory
+    os.chdir(path)
+    # Check current working directory.
+    retval = os.getcwd()
+    print("Directory changed successfully %s" % retval)
+    #print("Directory '% s' created" % directory)
+    return 
+def check_dirs(fname):
+    path = '/home4/putkoff/gtsgate.com/script/wallets/wallets/'+str(fname)
+    isFile = os.path.isdir(path)
+    
+    return isFile 
+def change_dir(f):
+    path = "/home4/putkoff/gtsgate.com/script/wallets" + '/'+str(f)
+    retval = os.getcwd()
+    print ("Current working directory %s" % retval)
+    os.chdir(path)
+    retval = os.getcwd()
+    print("Directory changed successfully %s" % retval)
+    return
+def mkdirs(f):
+    import os  
+    directory = f
+    parent_dir = '/home4/putkoff/gtsgate.com/script/wallets/wallets'
+    path = os.path.join(parent_dir, directory)  
+    os.mkdir(path)  
+    print("Directory '% s' created" % directory)
+    return path
+def dirs_B(U):   
+    parent_dir = U
+    path = os.chdir(parent_dir)
+    os.chdir(str(path))
+    print(path)
+    return path
+
+def get_ti():
+    import datetime
+    T_S = datetime.datetime.now().timestamp()
+    pen(str(T_S),'last.txt')
+    T_S_D = str(datetime.datetime.now())[0:10]
+    day = int(int(T_S) - int(86400))
+    B_L = block(day)
+    B_G = block(int(T_S))
+    
+    TS = '{"TS":["'+str(T_S)+'","'+str(T_S_D)+'","'+str(B_L)+'","'+str(B_G)+'"]}'
+    pen(TS, 'T_S_pow.py')
+    return B_L,B_G,T_S,T_S_D,day
+def tryit_js(js):
+    try:
+        js = projs(str(js))
+        return js
+    except:
+        
+        return 0
+def tryit(A,N):
+    try:
+        tr = A[N]
+        return 0, N
+    except:
+        N = N - 1
+        return -1, N
+def countit(array,delim):
+    array_count = str(array)
+    len_count_A = len(array_count)
+    array_short = array_count.replace(delim,"")
+    len_count_B = len(array_short)
+    arr_num = len_count_A - len_count_B
+    arr_num = arr_num
+    return arr_num
+def count_js(B):
+    N = 0
+    M = 0
+    while M != -1:
+        M,L_B = tryit(B,N)
+        N = N + 1
+    L_B = L_B - 1
+    return L_B
+def sites(A):
+    U = [A]
+    for url in U:
+        X = str(U[0])
+        r = requests.get(X)
+        PS = r.text
+        JS = json.loads(PS)
+    return JS
+def supply(add,Ad_pa):
+    key = keys()
+    CONT_SUP = 'http://api.etherscan.io/api?module=account&action=tokenbalance&contractaddress='+str(add).lower()+'&address='+str(Ad_pa).lower()+'&tag=latest&apikey='+key
+    return  CONT_SUP
+def wall_sup(Ad_pa,B_L,B_G):
+    key = keys()
+    WALL_TR = 'http://api.etherscan.io/api?module=account&action=tokentx&address='+str(Ad_pa)+'&startblock='+str(B_L)+'&endblock='+str(B_G)+'&sort=asc&apikey='+key
+    return WALL_TR
+def tok_sup(Ad_pa):
+    key = keys()
+    TOK_LP = 'https://api-cn.etherscan.com/api?module=stats&action=tokensupply&contractaddress=' + str(Ad_pa).lower() + '&apikey='+key
+    return TOK_LP
+def JS_prep(J):
+    import gc
+    gc.collect()
+    J = str(J).replace(' ','').replace("'",'"').replace(']','').replace('[','').replace('}{','},{').replace('or"s','ors').replace('[,','[').replace('None','')
+    
+    if str(J) != ' ' and str(J) != '' and str(J) != '[]'and str(J) != '{}':
+        J = str(J)
+        L = int(len(J))
+        i = int(-1)
+        N,M = tryit(J,i)
+        if int(N) == int(0):
+            while (int(N) - int(L)) != int(0):
+                if J[i] == '' or J[i] == ',' or J[i] == ']' or J[i] == ' ':
+                    J = J[:-1]
+                    #L = int(len(J))
+                    
+                    N = timer(N)
+                else:
+                    N = int(L)
+        L = int(len(J))
+        i = int(0)
+        N,M = tryit(J,i)
+        if int(N) == int(0):
+            while (int(N) - int(L)) !=int(0):
+                if J[i] == '' or J[i] == ',' or J[i] == ']' or J[i] == ' ':
+                    J = J[1:]
+                    #L = int(len(J))
+                    
+                    N = timer(N)
+                else:
+                    N = int(L)
+    return J
+def JS_prep_B(A):
+    A = str(A).replace(' ','').replace("'",'"').replace(',}','}').replace('{,','{').replace('}{','},{').replace('or"s','ors').replace('[,','[').replace('None','').replace('}','').replace('{','').replace(']','').replace('[','')
+    return A
+def projs(A):
+    import gc
+    
+    J = JS_prep(A)
+    if J == '' or J == ' ':
+        return J
+    J =  str(J).replace('"tokenName":"","','"tokenName":"0","').replace('"tokenSymbol":"","','"tokenSymbol":"0","').replace('"tokenDecimal":"","','"tokenDecimal":"0","')
+    J =  str(J).replace('":"","','":"0","')
+    J =  str(J).replace('""','"').replace(',,',',')
+    gc.collect()
+    J = str('[' +J+ ']').replace(' ','')
+    J =  str(J).replace('[,','[').replace(',]',']')
+    
+    pen_B(str(J),'recent.txt')
+    return json.loads(J)
+def projs_B(A):
+    J = JS_prep_B(A)
+    if J == '':
+        return J
+    
+    while J[-1] == '' or J[-1] == ',' or J[-1] == ']' or J[-1] == ' ':
+        J = J[:-1]
+    while J[0] == '' or J[0] == ',' or J[0] == ']' or J[0] == ' ':
+        J = J[1:]
+    J = '{' + str(J) + '}'
+    return json.loads(J)
+def timer(N):
+    N = N + 1
+    return N
+def timermin(N):
+    N = N - 1
+    return N
+def find_point(B,D,X):
+    N = 0
+    done = 1
+    L = count_js(B)
+    while done != 0:
+        C = B[N]
+        if C[D] == str(X):
+            done = 0
+        if int(N) == int(L):
+            return ''
+        print(N,L)
+        N = timer(N)
+    N = int(N)
+    B = B[N:]
+    
+    return B
+def check_comp(J):
+    J = projs(J)
+    tr,N = tryit(J,0)
+    if tr != -1:
+        B = J[0]
+        E = B['blockNumber']
+        F = B['timeStamp']        
+        D = J[-1]
+        G = D['blockNumber']
+        H = D['timeStamp']
+        print(E,F,G,H,day)
+        if int(F) > int(H):
+            J = reverse(J)
+    return projs(J)
+def JS_rev(js):
+    pen_B(js,'other1.txt')
+    js = projs(js)
+    L = count_js(js)
+    js = js[L:]
+    pen_B(js,'other.txt')
+    return js
+def check_blk(f,bl,ts):
+    print('checking blk')
+    J = exists_js(f)
+    tr,N = tryit(J,0)
+    if int(tr) == int(0):
+        J = check_comp(J)
+        B = J[0]
+        E = B['blockNumber']
+        F = B['timeStamp']        
+        D = J[-1]
+        G = D['blockNumber']
+        H = D['timeStamp']
+        print(E,F,G,H,day)
+        #if int(F) < int(day):
+            #J = find_point(J,'timeStamp',int(day))
+        return J,G,H
+    
+    return J,bl,ts
+def crunch(js_A,js_B):
+    JS_A = JS_prep(str(JS_A))
+    JS_B = JS_prep(str(JS_B))
+    JS_C = str(JS_A) + str(JS_B)
+    return JS_C
+def rev_js(js):
+    L = int(count_js(js)) - int(1)
+    A = js[0:L]
+    B = js[-1]
+    C = crunch(A,B)
+    js = projs(str(C))
+    return js
+def get_stamps(js):
+    if str(js) != '' and str(js)!=' ' and str(js) != '[]' and str(js) != '{}':
+        A = js[0]
+        A = A['timeStamp']
+        L = count_js(js)
+        B = js[L]
+        B = B['timeStamp']
+        return A,B
+    return js
+def reverse(js):
+    print('reversing')
+    js = projs(js)
+    L_N = count_js(js)
+    X = ''
+    while int(L_N) != int(-1):
+        X = str(X) +str(js[L_N])+','
+        js = js[0:L_N]
+        L_N = timermin(L_N)
+    return projs(X)
+def wall(add,B_L,B_G,day,array,pairs,file):
+    
+    import time
+    js_new = ''
+    L = day,(int(day)+int(86400)),B_L,B_G
+    first = 0
+    J,B_L,T_S = check_blk(file,B_L,day)
+    done = 0
+    print(add,B_L,B_G,T_S)
+    while int(done) == int(0):
+        
+        link = wall_sup(add,B_L,B_G)
+        print(link)
+        JS = sites(link)
+        js = JS["result"]
+        
+        while str(js) == 'Max rate limit reached':
+            time.sleep(5)
+            print('sleeping... wallets')
+            js = wall_call(add,B_L,B_G)
+        L,done = first_last(js,L)
+        print(L,done)
+        A = js[0]
+        B = js[-1]
+        if int(A['timeStamp']) > int(B['timeStamp']):
+            js = reverse(js)
+        js,T_S = hashit(js,day,L[0],L[2],add,array,pairs,fname)
+        
+        js = JS_prep(js)
+        J =  str(J)+','+str(js)
+        B_L = L[3]
+         
+    J = projs(J)
+    pen_B(J,file)
+    return J
+def hashit(js,day,T_S,bl,add,array,pairs,fname):
+    Ts = T_S
+    print('hashing it')
+    js = projs(js)
+    
+    tr = 0
+    L_B = count_js(js)
+    H_js = exists_js('hashs.txt')
+    H = reader('hashs.txt')
+    B = ''
+    L_N = 0
+    if fname == 'burn_wall.txt':
+        arr = ''
+        L = count_js(pairs)
+        N = 0
+        while int(N) != int(L):
+            P = pairs[N]
+            arrs = array[P]
+            arr = arr + ',"'+arrs['pair']+'"\n'
+            arr = str(arr).lower()
+            N = N + 1
+        arr = '['+str(arr)+']'
+        arr = str(arr).replace('[,','[')
+        arr = json.loads(arr)
+        while int(L_N) != int(L_B) and tr != -1:
+            
+            line = js[L_N]
+            Ts = line["timeStamp"]
+            cont = line['contractAddress']
+            B_L = line['blockNumber']
+            if cont.lower() in arr and int(Ts) >= int(day) and int(Ts) > int(T_S) and int(B_L) > int(bl):
+                if line['to'].lower() == add.lower() or line['from'].lower() == add.lower():
+                    B = str(B)+','+str(line)+'\n'
+                    if line['hash'].lower() not in H_js:
+                        H =H.lower()+ ',"'+str(line['hash']).lower()+'"\n'
+                        H_js = '['+str(H)+']'
+                        H_js = str(H_js).replace('[,','[')
+                        H_js = json.loads(H_js)
+                    #print(L_N,L_B)
+            L_N = timer(L_N)
+    else:
+        while int(L_N) != int(L_B) and tr != -1:
+            tr,L_N = tryit(js,L_N)
+            line = js[L_N]
+            Ts = line["timeStamp"]
+            cont = line['contractAddress']
+            B_L = line['blockNumber']
+            if line['hash'].lower() not in H_js and int(Ts) >= int(T_S) and int(B_L) > int(bl):
+                if line['to'].lower() == add.lower() or line['from'].lower() == add.lower():
+                    B = str(B)+','+str(line)+'\n'
+            L_N = timer(L_N)
+            #print(L_N,L_B,fname,Ts,T_S)
+    pen(H,'hashs.txt')
+    tr,i = tryit(B,0)
+    if int(tr) != int(-1):
+        if B[0] == ',':
+            B = B[1:]
+        B = projs(B)
+    
+    return B,Ts
+    
+def prices(tok_A, tok_B,array_specs):
+    
+    array_specs = json.loads(array_specs)
+    tok_A_allias = array_specs[str(tok_A)]
+    tok_B_allias = array_specs[str(tok_B)]
+    tok_A_allias = tok_A_allias['name_price']
+    tok_B_allias = tok_B_allias['name_price']
+    price_A = int(1)
+    price_B = int(1)
+    si = int(2)
+    times = int(0)
+    balance_C = ''
+    num_tok = int(0)
+    page=''
+    currencies = [
+        'https://api.coingecko.com/api/v3/simple/price?ids='+str(tok_A_allias)+'&vs_currencies=usd',
+        'https://api.coingecko.com/api/v3/simple/price?ids='+str(tok_B_allias)+'&vs_currencies=usd'
+        ]
+    times = si
+    while times > 0:
+        for url in currencies:
+            site_st = str(currencies[num_tok])
+            if site_st =='https://api.coingecko.com/api/v3/simple/price?ids=take_other&vs_currencies=usd' or site_st =='https://api.coingecko.com/api/v3/simple/price?ids=dollar&vs_currencies=usd':
+                new = site_st.replace('&vs_currencies=usd','')
+                new = new.replace('https://api.coingecko.com/api/v3/simple/price?ids=','')
+                price = new
+            else:                    
+                new = site_st.replace('&vs_currencies=usd','')
+                new = new.replace('https://api.coingecko.com/api/v3/simple/price?ids=','')
+                r = requests.get(url)
+                page_source = r.text
+                page_source = json.loads(page_source)
+                price = page_source[new]
+                price = price["usd"]
+                new = str(new)
+                price = str(price)
+            if num_tok == int(0):
+                toks = tok_A
+                price_A = price
+            else:
+                toks = tok_B
+                price_B = price
+            num_tok = num_tok + int(1)
+            times = times - int(1)
+    if tok_A_allias == 'dollar':
+        price_A = float(1.00)
+    if tok_B_allias == 'dollar':
+        price_B = float(1.00)
+    return price_A, price_B
+def works(worksheet, tok_A_B_add, tok_A, tok_B, tok_A_B, balance_A, balance_B, balance_C, price_A, price_B, tok_A_T, tok_B_T,tok_U_T,curr_val_B, avg_eth,num):
+    if balance_A == float(0):
+        balance_A = int(1)
+    if balance_B == float(0):
+        balance_B = int(1)
+    if balance_C == float(0):
+        balance_C = int(1)
+    if price_B == "take_other" and price_A == 'take_other':
+        price_A = int(1)
+        price_B = int(1)
+    if price_B == "take_other":
+        if balance_B != int(0) and balance_B != float(0.0):
+            price_B = (float(price_A)*float(balance_A))/float(balance_B)
+            
+        else:
+            price_B = int(1)
+    if price_A == "take_other":
+        if balance_A != int(0) and balance_A != float(0.0) and (0 - float(balance_A)) < float(0.0):
+            price_A = (float(price_B)*float(balance_B))/float(balance_A)
+            
+        else:
+            price_A = int(1)
+    liq_A = float(balance_A) * float(price_A)
+    liq_B = float(balance_B) * float(price_B)
+    tot_liq = liq_A + liq_B
+    if price_A == int(0):
+        price_A = liq_B / tok_A_T
+    if price_B == int(0):
+        price_B = liq_A / tok_B_T
+    perc_A = liq_A/tot_liq
+    perc_B = liq_B/tot_liq
+    tok_A_per_UNI = float(balance_A)/float(balance_C)
+    tok_vol_A = (float(tok_A_T) * float(price_A))
+    tok_A_fee = float(tok_vol_A) * float(0.003)
+    tok_per_UNI=tok_A_per_UNI
+    tok_B_per_UNI = float(balance_B)/float(balance_C)
+    if curr_val_B != float(0.0):
+        tok_vol_B = float(curr_val_B)
+    else:
+        tok_vol_B = float(tok_B_T)
+    tok_B_fee = tok_vol_B * float(0.003)
+    tok_per_UNI = tok_B_per_UNI
+    per_K = int(1000)/tot_liq
+    per_ten_K = int(10000)/tot_liq
+    per_K_A = per_K*tok_A_fee
+    per_ten_K_A = per_ten_K*tok_A_fee
+    per_K_B = per_K*tok_B_fee
+    per_ten_K_B = per_ten_K*tok_B_fee
+    cells = num + int(2)
+    alpha_cell = int(0)
+    cell = str(alpha[alpha_cell]) + str(cells)
+    print(cell)
+    timer = int(-1)
+    price_diff_B = int(0)
+    price_diff_A = int(0)
+    price_diff_T = int(0)
+    sheet_hist = exists(path_bal+'/sheet_hist.txt')
+    sheet_keep = "tok_A_B", "balance_A", "balance_B", "balance_C", "price_A", "price_B", "liq_A", "liq_B", "perc_A", "perc_B", "tot_liq", "tok_A_T", "tok_B_T", "tok_U_T", "tok_A_per_UNI", "tok_B_per_UNI", "tok_vol_A", "tok_vol_B", "tok_A_fee", "tok_B_fee", "per_K_A", "per_ten_K_A", "per_K_B", "per_ten_K_B", "tok_A_B_add", "price_diff_A", "price_diff_B", "hours"   
+    
+    sheet_vari = str(tok_A_B), str(balance_A), str(balance_B), str(balance_C), str(price_A), str(price_B), str(liq_A), str(liq_B), str(perc_A), str(perc_B), str(tot_liq), str(tok_A_T), str(tok_B_T), str(tok_U_T), str(tok_A_per_UNI), str(tok_B_per_UNI), str(tok_vol_A), str(tok_vol_B), str(tok_A_fee), str(tok_B_fee), str(per_K_A), str(per_ten_K_A), str(per_K_B), str(per_ten_K_B), str("https://info.uniswap.org/pair/"+tok_A_B_add), str(price_diff_A), str(price_diff_B), str('24')    
+    len_keet = countit(str(sheet_keep), ',')
+    len_keet = len_keet + int(1)
+    print(len_keet)
+    num_keet = int(0)
+    len_sheet = countit(str(sheet_vari), ',')
+    len_sheet = len_sheet + int(1)
+    
+    num_sheet = int(0)
+    while num_sheet != len_sheet:
+        worksheet = worksheet +'\n'+'worksheet.write('+"'"+cell+"'"+', '+"'"+sheet_vari[num_sheet]+"'"+')'
+        if num_sheet < int(14):
+            if sheet_keep[num_sheet] == 'tok_A_B':
+                sheet_hist = str(sheet_hist) + '\n"'+sheet_vari[num_sheet] +'":{'
+            elif sheet_keep[num_sheet] == "tok_U_T":
+                sheet_hist = str(sheet_hist) + '"'+sheet_keep[num_sheet] +'":"'+sheet_vari[num_sheet]+'"},'
+            else:
+                sheet_hist = str(sheet_hist) + '"'+sheet_keep[num_sheet] +'":"'+sheet_vari[num_sheet]+'",'
+        alpha_cell = alpha_cell + int(1)
+        cell = str(alpha[alpha_cell]) + str(cells)
+        num_sheet = num_sheet + int(1)
+    pen(sheet_hist,path_bal+'/sheet_hist.txt')
+    Pr = reader(path_price+'/price.txt')
+    P = projs_B(Pr)
+    if tok[0] not in P:
+        Pr = str(Pr) +'"'+str(tok[0])+'":"'+str(price_A)+'",'
+    if tok[1] not in P:
+        Pr = str(Pr) +'"'+str(tok[1])+'":"'+str(price_B)+'",'
+    pen(Pr,path_price+'/price.txt')
+    return worksheet
+def renum(old,A_js,day,T_S,eth_avg):
+    print('renum',day)
+    A = projs(A_js)
+    eth_chart = ''
+    count = 0
+    prev_B = int(day)
+    A_txt = old
+    B = int(day)
+    prev_price = eth_avg
+    C = 0
+    
+    while C == 1:
+        
+        if str(B) not in A:
+            B = timer(B)
+        else:
+            prev_price = float(A[str(B)])
+            while int(prev_B) >= int(B):
+                print(prev_B)
+                eth_chart = ',"'+str(prev_B)+'":"'+str(prev_price)+'"\n'+str(eth_chart)
+                
+                prev_B = timer(int(prev_B))
+            C = 0
+    while C == 0 and int(B) != int(T_S):
+        
+        if str(B) in A and int(count) == int(0):
+            eth_chart = ',"'+str(B)+'":"'+str(A[str(B)])+'"\n'+str(eth_chart)
+            prev_price = float(A[str(B)])
+            prev_B = int(B)
+        elif str(B) in A and int(count) != int(0):
+            curr_price = float(A[str(B)])
+            eth_avg = (float(prev_price)+ float(curr_price))/float(2)
+            while int(prev_B) != int(B):
+                eth_chart = ',"'+str(prev_B)+'":"'+str(eth_avg)+'"\n'+str(eth_chart)
+                prev_B = int(timer(prev_B))
+            B = int(prev_B)
+            count = int(0)
+        elif str(B) not in A:
+            count = timer(count)
+        B = timer(B)
+        
+    if int(B) == int(T_S) and int(count) != int(0):
+        while int(prev_B) < int(T_S):
+            
+            prev_B = timer(int(prev_B))
+            eth_chart = ',"'+str(prev_B)+'":"'+str(prev_price)+'"\n'+str(eth_chart)
+        
+    eth_chart = '"last":"'+str(T_S)+'"\n'+',"avg":"'+str(eth_avg)+'"\n'+str(eth_chart) 
+    pen(str(eth_chart),path_price+'/eth_price.txt')
+    return eth_chart
+def findit(js,X):
+    L_eth = count_js(js)
+    N = 0
+    while js[N] != str(X):
+        N = timer(N)
+    return N
+def organ(js):
+    js
+    return js
+def add_brac(S):
+    return str('{'+str(S)+'}')
+def rem_comm(S):
+    S = str(S)
+    if str(S[0]) == ',':
+        S = str(S)[1:]
+    if str(S[-1]) == ',':
+        S = str(S)[:-1]
+   
+    return S
+def ch_quote(S):
+    return str(str(S).replace("'",'"'))
+def foldersave():
+    B_L,B_G,Ts,date,day = get_ti()
+    foldate = 'fri','sat','sun','mon','tues','wed','thur',
+    sec = float(1)
+    mi = float(60)
+    hour = float(60*mi)
+    day = float(24*hour)
+    week = float(7*day)
+    fri = 1609510651.1613681
+    print('fri',fri)
+    since = (float(Ts)-(float(fri)))
+    D = mi,hour,day,week
+    D_2 = 'sec,hour,day,week'
+    D_3 = D_2.split(',')
+    N = 0
+    jas = ''
+    home = '/home4/putkoff/gtsgate.com/script/wallets/wallets/'
+    while N <= int(3):
+        i = float(since)/float(D[N])
+        jas = jas+',"'+str(D_3[N])+'":"'+str(float(i))+'"'
+        N = timer(N)
+        TSH = str(ch_quote(add_brac(rem_comm(jas))))
+        print(i,TSH,N)
+        timesheet = json.loads(TSH)
+    days = int(float(timesheet['day']))
+    date = '_'+str(date).replace('-','_')
+    fold_name = str(foldate[int(days)])+str(date)
+    path_price = str(fold_name)+'/'+'price'
+    path_bal = str(fold_name)+'/'+'bal'
+    path_workbook = str(fold_name)+'/'+'workbook'
+    X = fold_name, path_price,path_bal,path_workbook
+    X_name = 'fold_name','path_price','path_bal','path_workbook'
+    i = 0
+    while i != 4:
+        A= check_dirs(X[i])
+        print(A)
+        if A == True:
+            
+            i = timer(i)
+        elif A == False:
+            print('we change it')
+            mkdirs(X[i])
+            i = timer(i)
+        
+    return fold_name,home+path_price,home+path_bal,home+path_workbook
+Q = 1
+for Q in range (0,7):
+    for Q in range (0,2):
+        fold_name, path_price,path_bal,path_workbook = foldersave()
+        dirs_A(fold_name)
+        alpha = 'A;B;C;D;E;F;G;H;I;J;K;L;M;N;O;P;Q;R;S;T;U;V;W;X;Y;Z;AA;AB;AC;AD;AE;AF;AG;AH;AI;AJ;AK;AL;AM;AN;AO;AP;AQ;AR;AS;AT;AU;AV;AW;AX;AY;AZ;BA;BB;BC;BD;BE;BF;BG;BH;BI;BJ;BK;BL;BM;BN;BO;BP;BQ;BR;BS;BT;BU;BV;BW;BX;BY;BZ;CA;CB;CC;CD;CE;CF;CG;CH;CI;CJ;CK;CL;CM;CN;CO;CP;CQ;CR;CS;CT;CU;CV;CW;CX;CY;CZ'
+        pairs = reader('/home4/putkoff/gtsgate.com/script/wallets/variables/pairs.py')
+        array_specs =reader('/home4/putkoff/gtsgate.com/script/wallets/variables/specs.py')
+        array = reader('/home4/putkoff/gtsgate.com/script/wallets/variables/array.py')
+        alpha = alpha.split(';')
+        alpha_cell = int(-1)
+        allias = {"REN":"ren","USDX":"usdx","HKMT":"","SNX":"synthetix-network-token","DOKI":"doki-doki-finance","CEL":"celsius-network-token","PNK":"kleros","CHA":"chain-games","DAI":"dai","LINK":'chainlink',"FARM":"harvest-finance","UNI":'uniswap',"YFI":'yearn-finance',"BTC":'bitcoin',"OCEAN":'ocean-protocol',"FET":'fetch-ai',"WETH":"ethereum","WBTC":"bitcoin","USDT":"tether","USDC":"usd-coin","CORE":"cvault-finance","DPI":"defipulse-index","EURS":"stasis-eurs","PICKLE":"pickle-finance","AMPL":"ampleforth","wANATHA":"wrapped-anatha","TOMOE":"tomoe","HEX":"hex","MKR":"maker","LEND":"aave-old","AAVE":"aave","LRC":"loopring","DEGO":"dego-finance","MTA":"meta","REN":"ren","KIF":"kittenfinance","wNXM":"wrapped-nxm","DHT":"dhedge-dao","ANT":"aragon","STAKE":"xdai-stake","XFI":"xfinance","XIO":"xio","DZAR":"digital-rand"}
+        worksheet = 'import xlsxwriter'+'\n'+"workbook = xlsxwriter.Workbook('"+"Welcome.xlsx')"+'\n'+'worksheet = workbook.add_worksheet()'+ '\n'+'worksheet.write('+"'"+"A1"+"'"+', '+"'"+"PAIR"+"'"+')'+ '\n'+'worksheet.write('+"'"+"B1"+"'"+', '+"'"+"token_A"+"'"+')'+ '\n'+'worksheet.write('+"'"+"C1"+"'"+', '+"'"+"token_B"+"'"+')'+ '\n'+'worksheet.write('+"'"+"D1"+"'"+', '+"'"+"UNI_V2"+"'"+')'+ '\n'+'worksheet.write('+"'"+"E1"+"'"+', '+"'"+"TOK1_price"+"'"+')'+ '\n'+'worksheet.write('+"'"+"F1"+"'"+', '+"'"+"TOK2_price"+"'"+')'+ '\n'+'worksheet.write('+"'"+"G1"+"'"+', '+"'"+"LIQ_TOK_1"+"'"+')' + '\n'+'worksheet.write('+"'"+"H1"+"'"+', '+"'"+"LIQ_TOK_2"+"'"+')'+ '\n'+'worksheet.write('+"'"+"I1"+"'"+', '+"'"+"PERC_TOK_1"+"'"+')'+ '\n'+'worksheet.write('+"'"+"J1"+"'"+', '+"'"+"PERC_TOK_2"+"'"+')'+ '\n'+'worksheet.write('+"'"+"K1"+"'"+', '+"'"+"TOT_LIQ"+"'"+')'+ '\n'+'worksheet.write('+"'"+"L1"+"'"+', '+"'"+"TOT_tok_A_vol"+"'"+')'+'\n'+'worksheet.write('+"'"+"M1"+"'"+', '+"'"+"TOT_tok_B_vol"+"'"+')'+ '\n'+'worksheet.write('+"'"+"N1"+"'"+', '+"'"+"TOT_UNI_vol"+"'"+')'+ '\n'+'worksheet.write('+"'"+"O1"+"'"+', '+"'"+"TOK_PER_UNI_A"+"'"+')'+'\n'+'worksheet.write('+"'"+"P1"+"'"+', '+"'"+"TOK_PER_UNI_B"+"'"+')'+'\n'+'worksheet.write('+"'"+"Q1"+"'"+', '+"'"+"TOT_day_VOL_A"+"'"+')'+ '\n'+'worksheet.write('+"'"+"R1"+"'"+', '+"'"+"TOT_day_VOL_B"+"'"+')'+ '\n'+'worksheet.write('+"'"+"S1"+"'"+', '+"'"+"TOT_A_FEE"+"'"+')'+ '\n'+'worksheet.write('+"'"+"T1"+"'"+', '+"'"+"TOT_B_FEE"+"'"+')'+ '\n'+'worksheet.write('+"'"+"U1"+"'"+', '+"'"+"$_per_1K_A"+"'"+')'+ '\n'+'worksheet.write('+"'"+"V1"+"'"+', '+"'"+"$_per_10K_A"+"'"+')'+ '\n'+'worksheet.write('+"'"+"W1"+"'"+', '+"'"+"$_per_1K_B"+"'"+')'+ '\n'+'worksheet.write('+"'"+"X1"+"'"+', '+"'"+"$_per_10K_B"+"'"+')'+ '\n'+'worksheet.write('+"'"+"Y1"+"'"+', '+"'"+"LP_Address"+"'"+')'+ '\n'+'worksheet.write('+"'"+"Z1"+"'"+', '+"'"+"24_hr_A"+"'"+')'+ '\n'+'worksheet.write('+"'"+"AA1"+"'"+', '+"'"+"24_hr_B"+"'"+')'+ '\n'+'worksheet.write('+"'"+"AB1"+"'"+', '+"'"+"Hours"+"'"+')'
+        jsons = 'price = '
+        num_fee = int(0)
+        time_eth = ''
+        burn = '0x0000000000000000000000000000000000000000'
+        tots = '{'
+        B_L,B_G,T_S,T_S_D,day = get_ti()
+        H_js = exists_js('hashs.txt')
+        eth_chart = exists(path_price+'/eth_price.txt')
+        eth_chart_js = projs(eth_chart)
+    
+        if 'last' in eth_chart_js:
+            last = int(eth_chart_js['last'])
+            L_eth = count_js(eth_chart_js)
+            if str(day) in eth_chart_js:
+                L_eth = findit(eth_chart_js,str(day))
+            eth_chart_js = eth_chart_js[2:L_eth]
+            eth_chart_old = (eth_chart_js).replace('{','').replace('}','')
+            
+        else:
+            eth_chart_old = ''
+            last = day
+        counter = 0
+        eth_avg = 0
+        times_j = '["'+ str(T_S)+'"]'
+        times = json.loads(times_j)
+        pairs = json.loads(pairs)
+        array = json.loads(array)
+        pen('',path_price+'/price.txt')
+        pairs = pairs['pai']
+        L_T_F = count_js(pairs)
+        N = 0
+        A = ''
+        fname = 'burn_wall.txt'
+        Q = 3
+    for Q in range (2,4):
+        js = wall(burn,B_L,B_G,day,array,pairs,fname)
+        while N != L_T_F:
+            P = pairs[N]
+            A = array[P]
+            print(P)
+            C = 0
+            tok = str(P).split('-')
+            adds = A[tok[0]],A[tok[1]],A['pair']
+            
+            fname = str(tok[0])+'_'+str(tok[1])+'wall.txt'
+            print(adds[2],B_L,B_G,day,fname)
+            js = wall(adds[2],B_L,B_G,day,array,pairs,fname)
+            prev_stamp = T_S
+            hashs_A = 0
+            hashs_B = 0
+            vol_B = 0
+            tok_A_T = 0
+            tok_B_T = 0
+            val_B = 0
+            val_A = 0
+            count = 0
+            hash_A_chart = '{'
+            hash_B_chart = '{'
+            L_T = count_js(js)
+            I = 0
+            while I != L_T:
+                tr,X= tryit(js,I)
+                if tr != -1:
+                    W = js[I]
+                else:
+                    I = L_T
+                hashs = W['hash']
+                St = W['timeStamp']
+                if int(St) > int(day) and hashs not in H_js:
+                    to = str(W['to']).lower()
+                    fro = str(W['from']).lower()
+                    if to == str(adds[2]).lower() or fro == str(adds[2]).lower():
+                        cont = W["contractAddress"]
+                        val = int(W['value'])
+                        symbol = W['tokenSymbol']
+                        dec = W['tokenDecimal']
+                        if str(cont).lower() == str(adds[0]).lower() or str(cont).upper() == str(adds[0]).upper():
+                            expo = float(10)**(float(-1)*float(dec))
+                            bal = float(float(val) * float(expo))
+                            tok_A_T = float(tok_A_T) + bal
+                            expo_A = expo
+                            hashs_A = hashs
+                            val_A = bal
+                            #hash_A_chart = hash_A_chart+',\n"'+str(hashs_A)+'":["'+str(val_A)+'","'+str(St)+'"]'
+                        if str(cont).lower() == str(adds[1]).lower() or str(cont).upper() == str(adds[1]).upper():
+                            expo = float(10)**(float(-1)*float(dec))
+                            bal = float(float(val) * float(expo))
+                            tok_B_T = float(tok_B_T) + float(bal)
+                            expo_B = expo
+                            hashs_B = hashs
+                            val_B = bal
+                            #hash_B_chart = hash_B_chart+',\n"'+str(hashs_B)+'":["'+str(val_B)+'","'+str(St)+'"]'
+                            if int(N) >= int(3) and tok[1] == 'WETH':
+                                if str(St) in eth_chart_js:
+                                    vol_B = float(vol_B) + (float(val_B) * float(eth_chart_js[str(St)]))
+                                else:
+                                    vol_B = float(vol_B) + (float(val_B) * float(eth_chart_js['avg']))
+                            elif int(N) >= int(3) and tok[1] != 'WETH':
+                                vol_B = float(tok_B_T)
+                        elif int(N) < int(3) and int(last) <= int(St) and hashs_B == hashs_A and hashs_A != 0 and hashs_B != 0  and val_B != float(0) and val_A != float(0) and str(St) not in times:
+                            eth_price = val_A/val_B
+                            eth_avg = float(eth_avg) + float(eth_price)
+                            time_eth = ',"'+str(St)+'"'+str(time_eth) + '\n'
+                            eth_chart = ',"'+str(St)+'":"'+str(eth_price)+'"\n'+str(eth_chart)
+                            times = '['+time_eth + ']'
+                            times = str(times).replace('[,','[').replace("'",'"')
+                            times = json.loads(times)
+                            vol_B = float(tok_A_T)
+                            counter = int(counter) + int(1)
+                
+                I = timer(I)  
+            if int(N) == int(2):
+                print('n==2')
+                pen(str(times),path_price+'/times.txt')
+                eth_avg = float(eth_avg)/float(counter)
+                eth_chart = '"avg":"'+str(eth_avg)+'"\n'+str(eth_chart)
+                eth_chart_js = '{'+str(JS_prep(eth_chart)).replace("'",'"') + '}'
+                eth_chart_js = renum(eth_chart,eth_chart_js,day,T_S,eth_avg)
+                eth_chart_js = str(projs_B(eth_chart_js)).replace("'",'"')
+                eth_chart_js = json.loads(eth_chart_js)
+            #hash_B_chart_js = str(ch_quote(add_brac(rem_comm(hash_B_chart)))).replace('{,','{')
+            #hash_B_chart_js = json.loads(hash_B_chart)
+            #hash_A_chart_js = str(ch_quote(add_brac(rem_comm(hash_A_chart)))).replace('{,','{')
+            #hash_A_chart_js = json.loads(hash_A_chart)
+            
+                
+            if N == 0:
+                deli = ''
+            else:
+                deli = ','
+            tot = deli+'"'+str(P)+'":{"vol_B":"'+str(vol_B)+'",' 
+            I = 0
+            tok_pull = 'balance_A','balance_B'
+            if 'expo_A' not in globals():
+                expo_A = array_specs[tok[0]]
+                expo_A = expo_A['expo']
+                expo_A = (float(10)**(float(-1)*float(expo_A)))
+                
+            if 'expo_B' not in globals():
+                expo_B = array_specs[tok[1]]
+                expo_B = expo_B['expo']
+                expo_B = (float(10)**(float(-1)*float(expo_A)))
+            ex = expo_A,expo_B,(float(10)**(float(-1)*float(18)))
+            while I !=2:
+                su = supply(adds[I],adds[2])
+                sup = sites(su)
+                while str(sup['result']) == 'Max rate limit reached':
+                    time.sleep(5)
+                    print('sleeping... balances')
+                    su = supply(adds[I],adds[2])
+                    sup = sites(su)
+                val = float(sup['result']) * float(ex[I])
+                tot = str(tot)+'"'+str(tok_pull[I])+'":"'+str(val)+'",'
+                I = timer(I)
+            sups = tok_sup(adds[2])
+            sups = sites(sups)
+            bal_C = float(sups['result']) * float(ex[2])
+            price_A,price_B = prices(tok[0], tok[1],array_specs)
+            tot = str(tot)+'"volA":"'+str(tok_A_T)+'"'+',"volB":"'+str(tok_B_T)+'","UNI_V2":"'+str(bal_C)+'","priceA":"'+str(price_A)+'"'+',"priceB":"'+str(price_B)+'"}'
+            #tot = str(tot)+',"'+str(tok[I])+'":"'+str(val)+'"'
+            #tot = str(tot)+'"bal_'+str(tok[0])+'":"'+str(tok_A_T)+'"'+',"bal_'+str(tok[1])+'":"'+str(tok_B_T)+'","UNI_V2":"'+str(val)+'","price'+str(tok[0])+'":"'+str(price_A)+'"'+',"price_'+str(tok[1])+'":"'+str(price_B)+'","UNI_V2":"'+str(val)+'"}'
+            tot = str('{'+str(tot).replace("'",'"')+'}').replace('{,','{')
+            tots = str(tots)+ '\n'+str(tot)+','
+            tots = str(tots).replace('{,','{')
+            
+            pen(str(tots),path_bal+'/balances_new.txt')
+            print(tot)
+            total = json.loads(tot)
+            total = total[P]
+            eth_avg = float(eth_avg)/float(counter)
+            worksheet = works(worksheet, adds[2], tok[0], tok[1], P, total['balance_A'], total['balance_B'], total['UNI_V2'], price_A, price_B, tok_A_T, tok_B_T,0,vol_B, eth_avg,N)
+            worksheets = worksheet +'\nworkbook.close()'
+            pen_B(worksheets, path_workbook+'/workbook.py')
+            N = timer(N)
+        W = 5
+    for Q in range (4,6):
+    
+        pen(str(tots),path_bal+'/balances.txt')
+        worksheet = worksheet +'\nworkbook.close()'
+        pen_B(worksheet,path_workbook+'/workbook.py')
+        price = reader(path_price+'/price.txt')
+        price = projs_B(price)
+        price = '"'+str(T_S)+'":{'+str(price)+'}'
+        fname = 'price'+str(T_S)+'.txt'
+        pen(price,fname)
+        N = 1000
+        Q = 1
+
