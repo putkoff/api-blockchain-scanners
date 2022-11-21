@@ -1,0 +1,307 @@
+import datetime
+import requests
+import json
+import os
+import sys
+import sched, time
+import re
+def change_dir():
+    path = '/home4/putkoff/gtsgate.com/script/wallets/wallets/sun_2021_01_03'
+    retval = os.getcwd()
+    print ("Current working directory %s" % retval)
+    os.chdir(path)
+    retval = os.getcwd()
+    print("Directory changed successfully %s" % retval)
+    return
+change_dir()
+def reques_timer():
+    import datetime
+    now = datetime.datetime.now().timestamp()
+    i = (float(now) - float(reader_last('last.txt',0)))
+    if float(i) < float(0.31):
+        return (float(0.31) - float(i)), now
+    return 0, now
+def sites(A):
+    U = [A]
+    for url in U:
+        X = str(U[0])
+        i,now = reques_timer()
+        time.sleep(i)
+        r = requests.get(X)
+        pen_last(str(now),'last.txt',0)
+        PS = r.text
+        JS = json.loads(PS)
+        JS = JS['result']
+    return JS
+def tok_sup(Ad_pa):
+    key = keys()
+    TOK_LP = 'https://api-cn.etherscan.com/api?module=stats&action=tokensupply&contractaddress=' + str(Ad_pa).lower() + '&apikey='+key
+    return TOK_LP
+def supply(add,Ad_pa):
+    key = keys()
+    CONT_SUP = 'http://api.etherscan.io/api?module=account&action=tokenbalance&contractaddress='+str(add).lower()+'&address='+str(Ad_pa).lower()+'&tag=latest&apikey='+key
+    return  CONT_SUP
+def pen_last(txt,place,enco):
+    place = '/home4/putkoff/gtsgate.com/script/wallets/'+place
+    if enco != int(0):
+        with open(place, 'w', encoding=enco) as f:
+            text = f.write(txt)
+            return text
+    else:
+        with open(place, 'w') as f:
+            text = f.write(txt)
+            return text
+def reader_last(place,enco):
+    place = '/home4/putkoff/gtsgate.com/script/wallets/'+place
+    if enco != int(0):
+        with open(place, 'r', encoding=enco) as f:
+            text = f.read()
+            return text
+    else:
+        with open(place, 'r') as f:
+            text = f.read()
+            return text
+def pen(txt,place, enco):
+    place = '/home4/putkoff/gtsgate.com/script/wallets/wallets/' + str(place)
+    if enco != int(0):
+        with open(place, 'w', encoding=enco) as f:
+            text = f.write(txt)
+            return text
+    else:
+        with open(place, 'w') as f:
+            text = f.write(txt)
+            return text
+def reader(place, enco):
+    place = '/home4/putkoff/gtsgate.com/script/wallets/wallets/' + str(place)
+    if enco != int(0):
+        with open(place, 'r', encoding=enco) as f:
+            text = f.read()
+            return text
+    else:
+        with open(place, 'r') as f:
+            text = f.read()
+            return text
+def divide(bal_A,bal_B):
+    checker = int(0)
+    print(bal_A,bal_B)
+    while checker == int(0):
+        try:
+            balance = (float(bal_A) / float(bal_B))
+            checker = int(1)
+        except:
+            print("An exception occurred")
+            print('balance = (float(bal_A) / float(bal_B))')
+            checker = int(0)
+    return balance
+    
+def expos(balance, expo):
+    checker = int(0)
+    print(balance, expo)
+    while checker == int(0):
+        try:
+            balance = float(balance)*(float(10)**float(expo))
+            checker = int(1)
+        except:
+            print("An exception occurred")
+            print('balance = int(balance)*float(10)**int(expo)')
+            checker = int(0)
+    return balance
+def check(balance,expo):
+    checker = int(0)
+    while checker == int(0):
+        try:
+            balance = float(balance)*(float(10)**float(expo))
+            balance = str(balance)
+            checker = int(1)
+        except:
+            print("An exception occurred")
+            print('api = Tokens(contract_address=cont_add,api_key=key)')
+            checker = int(0)
+    return balance
+def keys():
+    return '5BGVIWTY2RHQHTJIMDNFY3WJM87GTUEXCW'
+worksheet = 'import xlsxwriter'+'\n'+"workbook = xlsxwriter.Workbook('"+"OCEAN_LP.xlsx')"+'\n'+'worksheet = workbook.add_worksheet()'+'\n'+'\n'+'worksheet.write('+"'"+'A1'+"'"+', '+"'"+'NAMES'+"'"+')'+'\n'+'worksheet.write('+"'"+'B1'+"'"+', '+"'"+'my LP amt'+"'"+')'+'\n'+'worksheet.write('+"'"+'C1'+"'"+', '+"'"+'ocean LP amt'+"'"+')'+'\n'+'worksheet.write('+"'"+'D1'+"'"+', '+"'"+'total LP amt'+"'"+')'+'\n'+'worksheet.write('+"'"+'E1'+"'"+', '+"'"+'percent LP'+"'"+')'+'\n'+'worksheet.write('+"'"+'F1'+"'"+', '+"'"+'Total LP'+"'"+')'+'\n'+'worksheet.write('+"'"+'G1'+"'"+', '+"'"+'LP in POOL'+"'"+')'+'\n'+'worksheet.write('+"'"+'H1'+"'"+', '+"'"+'total Worth'+"'"+')'+'\n'+'worksheet.write('+"'"+'I1'+"'"+', '+"'"+'Ocean Worth'+"'"+')'+'\n'+'worksheet.write('+"'"+'J1'+"'"+', '+"'"+'price'+"'"+')'+'\n'+'worksheet.write('+"'"+'K1'+"'"+', '+"'"+'My LP TOT'+"'"+')'+'\n'+'worksheet.write('+"'"+'L1'+"'"+', '+"'"+'perc'+"'"+')'+'\n'+'worksheet.write('+"'"+'M1'+"'"+', '+"'"+'address'+"'"+')'+'\n'
+alpha_cap = 'A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z'
+alpha_low = 'a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z'
+alpha_cap = alpha_cap.split(',')
+alpha_low = alpha_low.split(',')
+dec = int(18)
+
+key = keys()
+array = {"tok":"0x21Fc0DeEEB21B7a9deB1965dB0cf7688f17f56CD","LP":"0x470AacDae35E7a140Ea1438D256264EE2C70daeb","port":"50-50"},{"tok":"0xe06043a6721B3481E6b6063EC220b99Aa96df79a","LP":"0x9126676af96F8063106f0B287C79D4110940e925","port":"50-50"},{"tok":"0x9322AA125920B7C07560BB2AAA760254737acd1C","LP":"0xC01212867a8Bc57c8F0e79eB8335b2936e4064a4","port":"50-50"},{"tok":"0x72b83db03917315474984c087b5d9568d9e2137a","LP":"0xd21933588a3a9Ca479501b7eeC88FA3FFcA25701","port":"50-50"},{"tok":"0x23Cf7b17Ca8CDdee123B18f21b336DC53C795036","LP":"0x292048A0778c149CEb286854b2EF77Dcddb34f13","port":"50-50"},{"tok":"0xa68B7033Ffef08A8c74db2336825DC6d0fACBf11","LP":"0x512A2DD77B5f42a1EF0E742F27B28B0cff1a82eb","port":"50-50"},{"tok":"0xb8dbaDd74C2CcE2A8629d974A439b15FF6eBF0CA","LP":"0x3DF6370026b28CAbAaa3EA8D6828d9e4aaBe1553","port":"50-50"},{"tok":"0xe73423A5E1334842f1eb0E0C8eBDb40E5270ede3","LP":"0x801bc08147cC60708EaA8F0eA529699e55298405","port":"50-50"},{"tok":"0x454301695e854135620F19cA0CEfeC4f5F7F38Fb","LP":"0xDAEF186C69bB645a27B95123888689dF63390EA5","port":"50-50"},{"tok":"0xAB5cDA534bA0b9C946020fbc2967Cd9702C98ea0","LP":"0x1cDd1D07e2752924BC7D293727b95B5dF815348c","port":"50-50"},{"tok":"0x0a683Ca714bBDF02242226f14113e0045Fd9fe30","LP":"0x7f15ce9D3bfE153c2976d970e32d552AF5f4ad0A","port":"50-50"},{"tok":"0x08F87Aa198Db1556a7060b8Fe39610299C8b91Db","LP":"0x7b535aD6A0f1c655D5Ff804e5b4c3847cc678c9B","port":"50-50"},{"tok":"0x115fdb9e00f43a80860b4d513567e116270f6f76","LP":"0xD9d2492Fa4D22963958d2Ac22B8f808C9FaA1593","port":"50-50"},{"tok":"0xB421Fa07D2692AEAf0D6d219a97c37DC050e6095","LP":"0x5D38a1Dd3980B8AeBfE70655AD88Ba9b344e8C59","port":"50-50"},{"tok":"0x0c5e88AAD9cDEaFD61e1Ad94B11f5D4823e3305B","LP":"0x8202dfBef85218aef9E145F191973B666DDaA39f","port":"50-50"},{"tok":"0xB8334421ec9086BdaAEaDf48EAaf3B435eA1df70","LP":"0xECFab865dAEdB6E3bf80B0174b7B31482F8321cb","port":"50-50"},{"tok":"0x2e3Def4AE24bdA950A04D0368b4045Ec1E3E8D9F","LP":"0xBC857d10c064d49bE8C169B7aAc69697eb24c12c","port":"50-50"},{"tok":"0xfcB47f5781F14Ed7E032BD395113b84C897aA23f","LP":"0x64269Ce81a07f21cb3566aFA752810c4ca0BcB6F","port":"50-50"},{"tok":"0xa68a1021e89d6C1E9318696a06630BC9920BD1Ae","LP":"0xC2B2a49ec5c3a33dAA59FE05d166E6AcCB62f665","port":"50-50"},{"tok":"0x19b1CE5E97678604A3Aca7aeDe5588Fcba335f20","LP":"0xB5881341fD52a8C6083AbE9C454d9110620803a4","port":"50-50"},{"tok":"0x38e70f23fe53659506116a43f54d8352d3c0c37c","LP":"0x97907Ec112aC26A1fC9Cd8DeebEeb162aEA31520","port":"50-50"},{"tok":"0xdfdC25cA415dBfc3dF9Ae5465811DF3FAF6F075C","LP":"0x8B830FEE573Eb76d61289A0729dC49F32A27B2cC","port":"50-50"},{"tok":"0x8Ea6b9b9211dC6DBb71c49c4836336A03fc10962","LP":"0x7a0743936e283A5F6b125D21cbB062Cc0DF7B1f5","port":"50-50"},{"tok":"0x2b755A4080b3E460Dc8c2Fd3f6992b726b6c6ace","LP":"0x7A780CA105feaEAE8f176F2d5801ee2D0EF4d5F8","port":"50-50"},{"tok":"0x31a7e59318Ec3D04A7a5bb2a98733F161EC61AC6","LP":"0xE07e2F76Fc692d996ED251281f6F392671C30BCD","port":"50-50"},{"tok":"0xd6070FF42bA8DDF8B0C6794727D0ED1e17Ad5CB2","LP":"0x3C89b3FC6e3EedE1Ef4d81349120390B67481277","port":"50-50"},{"tok":"0xB7396dCD88686b0376F43eb1AB38667573A0B8a9","LP":"0xbD57873b2d8f6dC85721Cf1387B46c3f2b30644A","port":"90-10"},{"tok":"0x0E56c49d3013AcA0D6ee2aFDF5642c80F642D741","LP":"0x441780bB38D8c372f85D3ef15DB60e2FAA3E72Cd","port":"90-10"},{"tok":"0x7FcAA25Bbdc13bA7315c96F4C8100d850177EE49","LP":"0x1992Da1065d5FD0aAB9b6380926Aba8005f9d352","port":"50-50"},{"tok":"0xcaBb1BD7918123BCfbacB04495a73d35387908dB","LP":"0x8FF6bA19182a006c20795fd2815ca108cEef4D51","port":"50-50"},{"tok":"0xE1c051397Ef1cfE2e4989712E300D6348c8c7096","LP":"0x429474feece1D3198b60384b66EeB2A8438B538A","port":"50-50"},{"tok":"0x1337E73Ef8Ec1cd92d2C67B272D14223a43ffF46","LP":"0xdBA794A06E92139c119744e4157eE911Ba26ebe8","port":"90-10"},{"tok":"0xc2b604Fc7dDbD29a4dE56acb7fd1436a4E22F062","LP":"0x2E156795503A0CeE429F30FA5095c23ab5192085","port":"50-50"},{"tok":"0x747504C9Df9F643379860850e0e8B8b3d8515640","LP":"0xde1f0FFaD309b377F31D79D95C4aB6884e1cd700","port":"90-10"},{"tok":"0x4B4B3605eE850f041Ba4A817A79B2DF04A392CD4","LP":"0xfDd3d696c6328a7fD1D68E00CD8F59Aa315DcD93","port":"50-50"},{"tok":"0xd1419e62Df99F404D2aD81e23d6185aCe9197C06","LP":"0xfF23150eD652F4a65Caf0ae0a79CD8B86C47F9a2","port":"90-10"},{"tok":"0xA2CaFa40085935fC9345bD650C1331ccC1290f30","LP":"0x552DeA753e06e08dfdF5632423FDeBac42eF9E21","port":"50-50"},{"tok":"0xa2B8b3aC4207CFCCbDe4Ac7fa40214fd00A2BA71","LP":"0xaD67F7a72BA2ca971390B2a1dD907303bD577a4F","port":"90-10"},{"tok":"0xb07a8bb80242752ce164560ABCb6517DA90a4F65","LP":"0x2655b8A7357f4Bb4a8CB2170e196096aC8F0CDF9","port":"90-10"}
+names ={
+"0x21Fc0DeEEB21B7a9deB1965dB0cf7688f17f56CD":{"name":"Leading retail brands and consumer preferences"},
+"0xd1419e62Df99F404D2aD81e23d6185aCe9197C06":{"name":"Houston (TX) Rent Data"},
+"0xa2B8b3aC4207CFCCbDe4Ac7fa40214fd00A2BA71":{"name":"Product Pages of 1044709 Products on Amazon.com (processed data)"},
+"0x4B4B3605eE850f041Ba4A817A79B2DF04A392CD4":{"name":"Bitcoin historical data 2012-2020 1min intervals "},
+"0xA2CaFa40085935fC9345bD650C1331ccC1290f30":{"name":"Donald Trump United States Election Data"},
+"0xb07a8bb80242752ce164560ABCb6517DA90a4F65":{"name":"onsumer Browsing Data"},
+"0x0E56c49d3013AcA0D6ee2aFDF5642c80F642D741":{"name":"CO2 Accounting in Copenhagen"},
+"0xE1c051397Ef1cfE2e4989712E300D6348c8c7096":{"name":"CENTRAL AMERICA Integration, investment and trade opportunities"},
+"0xc2b604Fc7dDbD29a4dE56acb7fd1436a4E22F062":{"name":"INTERVIEW FOR  Amazons Delivery Service Partner Program"},
+"0xcaBb1BD7918123BCfbacB04495a73d35387908dB":{"name":"Algorithmic Crypto Trading "},
+"0x747504C9Df9F643379860850e0e8B8b3d8515640":{"name":"LinkedIn Company Metadata from over 5750000 global profiles (curated BigData)"},
+"0x1337E73Ef8Ec1cd92d2C67B272D14223a43ffF46":{"name":"17 years of data on shipping amounts of all goods through the Kiel-Canal between 2003 and 2019"},
+"0x7FcAA25Bbdc13bA7315c96F4C8100d850177EE49":{"name":"BatPaC EV Battery Model Simulation Runs Datase"},
+"0xB7396dCD88686b0376F43eb1AB38667573A0B8a9":{"name":"Intel &amp; AMD CPU Meta Data : Curated Dail"},
+"0x8Ea6b9b9211dC6DBb71c49c4836336A03fc10962":{"name":"IPV4 Global Geolocation Dataset (4+ Billion IPs"},
+"0xd6070FF42bA8DDF8B0C6794727D0ED1e17Ad5CB2":{"name":"Plex media library with over 100 shows and movies"},
+"0x31a7e59318Ec3D04A7a5bb2a98733F161EC61AC6":{"name":"Google Search Data for 1m+ IP addresse"},
+"0xdfdC25cA415dBfc3dF9Ae5465811DF3FAF6F075C":{"name":"Producer Prices Data (1+ Million"},
+"0x2b755A4080b3E460Dc8c2Fd3f6992b726b6c6ace":{"name":"|Rordy| Community Reputation Pool "},
+"0x38e70f23fe53659506116a43f54d8352d3c0c37c":{"name":"Sound Labs : Human recognised sound event dataset - 10,000 audio clips"},
+"0xfcB47f5781F14Ed7E032BD395113b84C897aA23f":{"name":"Ocean Marketplace Directory &amp; Pool Rating"},
+"0x19b1CE5E97678604A3Aca7aeDe5588Fcba335f20":{"name":"World financial data for hedge funds"},
+"0xa68a1021e89d6C1E9318696a06630BC9920BD1Ae":{"name":"Bitcoin Sentiment Analysis"},
+"0xB8334421ec9086BdaAEaDf48EAaf3B435eA1df70":{"name":"Analysis of Mental Health Support"},
+"0x9322AA125920B7C07560BB2AAA760254737acd1C":{"name":"Altcoin Sentiment Data"},
+"0x2e3Def4AE24bdA950A04D0368b4045Ec1E3E8D9F":{"name":"Rent Index 2010 - Present"},
+"0x0c5e88AAD9cDEaFD61e1Ad94B11f5D4823e3305B":{"name":"U.S. Real Estate Inventory by Zip Code"},
+"0xB421Fa07D2692AEAf0D6d219a97c37DC050e6095":{"name":"Shopify dropship forecast algorithm"},
+"0x115fdb9e00f43a80860b4d513567e116270f6f76":{"name":"2016 Presidential Campaign Finances "},
+"0x08F87Aa198Db1556a7060b8Fe39610299C8b91Db":{"name":"2020 Electoral data"},
+"0xAB5cDA534bA0b9C946020fbc2967Cd9702C98ea0":{"name":"Tesla,PayPal,Square,NVIDIA,AMD Financial data 2010-2019"},
+"0xE520BF153C85a3C5f37de47e65620307E36a53DD":{"name":"Apple Alphabet Amazon Facebook Microsoft Financial data 2010-2019"},
+"0xa68B7033Ffef08A8c74db2336825DC6d0fACBf11":{"name":"Dark Web Services, Hidden Wiki "},
+"0xb8dbaDd74C2CcE2A8629d974A439b15FF6eBF0CA":{"name":"Coronary IVUS pullback image set with segmented lumen area"},
+"0x0a683Ca714bBDF02242226f14113e0045Fd9fe30":{"name":"Spatiotemporal Data Analysis Project AIV"},
+"0x23Cf7b17Ca8CDdee123B18f21b336DC53C795036":{"name":"Bacterial Culture Research Data | 11,550 Strains"},
+"0x72b83db03917315474984c087b5d9568d9e2137a":{"name":"iPhone User Usage Data"},
+"0xe73423A5E1334842f1eb0E0C8eBDb40E5270ede3":{"name":"Servo Shift System for Transmissions - CAD, FEM and Matlab Model"},
+"0x454301695e854135620F19cA0CEfeC4f5F7F38Fb":{"name":"Crypto related functions and helpers for Swift"},
+"0xe06043a6721B3481E6b6063EC220b99Aa96df79a":{"name":"World Bank Open Data"}
+}
+TS = reader_last('T_S_pow.py', int(0))
+print(TS)
+TS = json.loads(str(TS))
+print(TS)
+TS = TS['TS']
+TS_pow = TS[0]
+fold_name = TS[4]
+pen(str(TS_pow),str(fold_name)+'/T_S_pow.py',0)
+num_arr = str(array)
+#print(num_arr)
+len_one = len(num_arr)
+num_arr = num_arr.replace('}, {','},{')
+len_two = len(num_arr)
+num_arr = (len_one - len_two)
+#print(num_arr)
+address_wall = '0xDB5BbAE9B0e82D60fEdc1dCc944eF8D319682Ce9'
+ocean_add = '0x967da4048cD07aB37855c090aAF366e4ce1b9F48'
+times = int(30)
+may_tot = int(0)
+ticker = int(-1)
+#with open("new.txt", 'w') as f:
+#    f.write("working")
+#    f.close()
+#path_bat= "C:/Users/Dialectic/Desktop/get_token_balance - Shortcut.lnk"
+# os.startfile(path_bat)
+#nott = num_arr + int(1)
+#ticker = nott
+#while ticker == nott:
+#    with open("C:/Users/Dialectic/Desktop/API_reqs/NEW_LIQ/new.txt", 'r') as f:
+#        new = f.read()
+#        print(new)
+#        f.close()
+#        if new == "done":
+#            ticker = int(-1)
+#        else:
+#            time.sleep(5)
+
+
+while ticker < int(num_arr):
+    address = address_wall
+    ticker = ticker + int(1)
+    ticker_two = ticker + int(2)
+    pair = array[ticker]
+    contract_add = pair["LP"]
+    tok_add = pair["tok"]
+    sup = supply(contract_add,  address)
+    link = sites(str(sup))
+    balance_A = str(expos(link,int(0)))
+    #print(balance_A)
+    cell = 'A' + str(ticker_two) #balance_A
+    cell_two = 'B' + str(ticker_two) #balance_A
+    cell_three = 'C' + str(ticker_two) #balance_C
+    cell_four = 'D' + str(ticker_two) #balance_F
+    cell_five = 'E' + str(ticker_two) #perc
+    cell_six = 'F' + str(ticker_two) #balance_H
+    cell_seven = 'G' + str(ticker_two) #balance_D
+    cell_eight = 'H' + str(ticker_two) #jay
+    cell_nine = 'I' + str(ticker_two) #kay
+    cell_ten = 'J' + str(ticker_two) #lay
+    cell_eleven = 'K' + str(ticker_two) #may
+    cell_twelve = 'L' + str(ticker_two) #pair["port"]
+    cell_thirteen = 'M' + str(ticker_two) #pair["LP"]
+    tok_name = names[str(tok_add)]
+    tok_name = tok_name["name"]
+    
+    cont_add = tok_add.replace('0x','')
+    sup = tok_sup(contract_add)
+    link = sites(str(sup))
+    print(link)
+    balance_B = str(expos(link,int(0)))
+    sup = supply(ocean_add, contract_add)
+    link = sites(str(sup))
+    balance_C = str(expos(link, int(-18)))
+    sup = supply(tok_add, contract_add)
+    link = sites(str(sup))
+    balance_D = str(expos(link,int(-18)))
+
+    link = tok_sup(contract_add)
+    balance_F = str(sites(link))
+    
+    #print(balance_F)
+    
+    link = tok_sup(tok_add)
+    balance_H  = sites(link)
+    balance_H = expos(balance_H, int(-18))
+    balance_H = str(balance_H)
+    perc = divide(balance_A,balance_F)
+    print(perc)
+
+    if pair["port"] == "90-10":
+        #print(balance_C)
+        jay = float(balance_C) * float(10)
+        kay = jay * float(1.1) / float(balance_D)
+        lay = float(balance_D) / float(jay)
+    else:
+        jay = float(balance_C)*int(2)
+        kay = str(balance_C)
+        lay = float(kay) / (float(balance_D) * float(1.1))
+    kay = str(kay)
+    lay = str(lay)
+    may = jay * float("%.10f" % perc)
+    may_tot = may_tot + may
+    
+    may = str(may)
+    jay = str(jay)
+    
+    #'=H'+ str(ticker_two) + '* E'+ str(ticker_two)
+    
+    hyper = '=HYPERLINK([@Column15],[@Column14])'
+    hyp = 'https://market.oceanprotocol.com/asset/did:op:'+cont_add
+    print('worksheet.write('+"'"+cell+"'"+', '+"'"+hyp+"')")
+    #print(hyp)
+    worksheet = str(worksheet)+'\n'+'worksheet.write('+"'A"+str(ticker_two)+"'"+', '+"'"+hyper+"')"+'\n'+'worksheet.write('+"'O"+str(ticker_two)+"'"+', '+"'"+hyp+"')"+'\n'+'worksheet.write('+"'N"+str(ticker_two)+"'"+', '+"'"+tok_name+"')"+'\n'+'worksheet.write('+"'M"+str(ticker_two)+"'"+', '+"'"+tok_name+"')"+'\n'+'worksheet.write('+"'"+cell_two+"'"+', '+"'"+balance_A+"'"+')'+'\n'+'worksheet.write('+"'"+cell_three+"'"+', '+"'"+balance_C+"'"+')'+'\n'+'worksheet.write('+"'"+cell_four+"'"+', '+"'"+balance_F+"'"+')'+'\n'+'worksheet.write('+"'"+cell_five+"'"+', '+"'"+str(perc)+"'"+')'+'\n'+'worksheet.write('+"'"+cell_six+"'"+', '+"'"+balance_H+"'"+')'+'\n'+'worksheet.write('+"'"+cell_seven+"'"+', '+"'"+balance_D+"'"+')'+'\n'+'worksheet.write('+"'"+cell_eight+"'"+', '+"'"+jay+"'"+')'+'\n'+'worksheet.write('+"'"+cell_nine+"'"+', '+"'"+kay+"'"+')'+'\n'+'worksheet.write('+"'"+cell_ten+"'"+', '+"'"+lay+"'"+')'+'\n'+'worksheet.write('+"'"+cell_eleven+"'"+', '+"'"+may+"'"+')'+'\n'+'worksheet.write('+"'"+cell_twelve+"'"+', '+"'"+pair["port"]+"'"+')'+'\n'+'worksheet.write('+"'"+cell_thirteen+"'"+', '+"'"+pair["LP"]+"'"+')'
+while ticker == int(num_arr):
+    fname = 'OCEAN_WORK.py'
+    worksheet = worksheet+'\n'+'worksheet.write('+"'A"+str(int(num_arr) + int(3))+"'"+', '+"'total'"+')'+'\n'+'worksheet.write('+"'B"+str(int(num_arr) + int(3))+"','"+str(may_tot)+"')"+'\n'+'workbook.close()'
+    import datetime
+    now = datetime.datetime.now().timestamp()
+    with open('/home4/putkoff/gtsgate.com/script/wallets/wallets/'+str(fold_name)+'/ocean/OCEAN_WORK_'+str(now)+'.py', 'w') as f:
+        f.write(worksheet)
+    
+    
+    
+    cube = (num_arr + int(22))
+    ticker = int(cube)
+while ticker == int(cube):
+    time.sleep(4)
+    times = int(30)
+    may_tot = int(0)
+    ticker = int(-1)
+if ticker == int(-1):
+    time.sleep(30)
+
+
